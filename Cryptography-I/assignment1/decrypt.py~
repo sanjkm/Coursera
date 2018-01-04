@@ -1,0 +1,40 @@
+# decrypt.py
+# Program will take in 11 encrypted messages as input, from file
+# It will decrypt the final message in the input file and output the
+# message.
+
+# Opens the input file, places the encrypted messages in a list,
+# and returns the list
+def getEncryptedMsgs (filename):
+    msgList = []
+    index = 1
+    with open(filename, 'r') as f:
+        for line in f:
+            if (index % 4) == 3:
+                msgList.append(line.rstrip('\n'))
+            index+=1
+    return msgList
+
+# Takes in two strings of hexadecimal values and outputs their XoR,
+# also in the form of hexadecimal string
+# First step is to cut the longer string such that each is of the same
+# length
+def HexStringXor (str1, str2):
+    hexVal = 16
+    strLen = min(len(str1), len(str2))
+    finalStr1 = str1[:strLen]
+    finalStr2 = str2[:strLen]
+
+    DecimalXoR = [int(x,hexVal)^int(y,hexVal)
+                  for (x,y) in zip(finalStr1, finalStr2)]
+
+    return ''.join([hex(val)[2:] for val in DecimalXoR])
+
+def main():
+    filename = 'msgs.txt'
+    msgList = getEncryptedMsgs (filename)
+
+    print HexStringXor ('123ab', '783af00')
+    
+main()
+    

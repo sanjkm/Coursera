@@ -1,0 +1,64 @@
+import java.util.ArrayList;
+import java.util.Set;
+
+/* CompliantNode refers to a node that follows the rules (not malicious)*/
+public class CompliantNode implements Node {
+
+    public CompliantNode(double p_graph, double p_malicious, double p_txDistribution, int numRounds) {
+        // IMPLEMENT THIS
+	double _p_graph = p_graph;
+	double _p_malicious = p_malicious;
+	double _p_txDistribution = _p_txDistribution;
+	double _numRounds = numRounds;
+
+	int currRound = 0;
+    }
+
+    // Creates an integer arraylist with the indices of each node
+    // following this node
+    
+    public void setFollowees(boolean[] followees) {
+        // IMPLEMENT THIS
+	ArrayList <Integer> followees_list = new ArrayList <Integer>();
+
+	for (int i = 0; i < followees.size(); i++) {
+	    if (followees[i] == true)
+		followees_list.add (i);
+	}
+		
+    }
+
+    // Creates Set containing the initally allocated valid transactions
+    // to the node
+    public void setPendingTransaction(Set<Transaction> pendingTransactions) {
+        // IMPLEMENT THIS
+	
+	Set <Transaction> initValidTransactions = new Set<Transaction> ();
+
+	for (Transaction pendingTx : pendingTransactions) 
+	    initValidTransactions.add (pendingTx);
+    }
+
+    public Set<Transaction> sendToFollowers() {
+        // IMPLEMENT THIS
+    }
+
+    // Creates map, where key is the node index, and value is a set of
+    // transactions that the key proposed as valid
+    public void receiveFromFollowees(Set<Candidate> candidates) {
+	
+	HashMap<Integer, Set<Transaction>> receivedTransactions = new HashMap<Integer, Set<Transaction>>();
+
+	for (Candidate test_candidate : candidates) {
+	    if (!receivedTransactions.containsKey (test_candidate.sender)) {
+		Set<Transaction> transactions = new HashSet<>();
+		receivedTransactions.put (test_candidate.sender, transactions);
+
+	    }
+
+	    Transaction cand_tx = new Transaction(test_candidate.tx);
+	    receivedTransactions.get(test_candidate.sender).add(cand_tx);
+	}
+    	    
+    }
+}

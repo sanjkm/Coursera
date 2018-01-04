@@ -1,0 +1,8 @@
+# VideoHash.py
+# Program will take a video file as input
+# It takes 1024 byte chunks of the file, starting from the end.
+# It calculates the hash value
+# of a chunk using SHA-256. Then, this hash is appended to the previous chuck,
+# which is then hashed, and appended to the previous block until the
+# beginning of the file
+

@@ -1,0 +1,115 @@
+// Block Chain should maintain only limited block nodes to satisfy the functions
+// You should not have all the blocks added to the block chain in memory 
+// as it would cause a memory overflow.
+
+import java.security.HashMap;
+
+public class BlockChain {
+    public static final int CUT_OFF_AGE = 10;
+
+    public int max_chain_len = 0;
+    public int curr_age = 1;
+
+    // Class that is mapped to each block at the end of a valid
+    // chain within the complete block chain
+    public class BuildingBlockFields {
+	public BuildingBlockFields (int _chain_len, int _chain_age,
+				    UTXOPool _chainUTXOPool) {
+	    public int chain_len = _chain_len;
+	    public int chain_age = _chain_age;
+	    TxHandler chainTxHander = TxHandler (_chainUTXOPool);
+	}
+
+    }
+
+    // This maps each chain's last block to its BuildingBlockFields,
+    // which are length, age, and its txHandler
+    public HashMap <Block, BuildingBlockFields> LastBlockFields = new HashMap <Block, BuildingBlockFields> ();
+    
+    
+    /**
+     * create an empty block chain with just a genesis block. Assume {@code genesisBlock} is a valid
+     * block
+     */
+    public BlockChain(Block genesisBlock) {
+        // IMPLEMENT THIS
+    }
+
+    /** Get the maximum height block */
+    public Block getMaxHeightBlock() {
+        // IMPLEMENT THIS
+    }
+
+    /** Get the UTXOPool for mining a new block on top of max height block */
+    public UTXOPool getMaxHeightUTXOPool() {
+        // IMPLEMENT THIS
+    }
+
+    /** Get the transaction pool to mine a new block */
+    public TransactionPool getTransactionPool() {
+        // IMPLEMENT THIS
+    }
+
+    /**
+     * Add {@code block} to the block chain if it is valid. For validity, all transactions should be
+     * valid and block should be at {@code height > (maxHeight - CUT_OFF_AGE)}.
+     * 
+     * <p>
+     * For example, you can try creating a new block over the genesis block (block height 2) if the
+     * block chain height is {@code <=
+     * CUT_OFF_AGE + 1}. As soon as {@code height > CUT_OFF_AGE + 1}, you cannot create a new block
+     * at height 2.
+     * 
+     * @return true if block is successfully added
+     */
+    public boolean addBlock(Block block) {
+        // IMPLEMENT THIS
+    }
+
+    /** Add a transaction to the transaction pool */
+    public void addTransaction(Transaction tx) {
+        // IMPLEMENT THIS
+    }
+
+    // This creates the UTXOPool for the initial genesis block
+    // of the blockchain
+    public UTXOPool createInitUTXOPool (Block initBlock) {
+	UTXOPool InitUTXOPool = new UTXOPool();
+	
+	// First, let's deal with the coinbase
+	Transaction coinbase_tx = initBlock.getCoinbase();
+	UTXO coinbase_UTXO = UTXO(coinbase_tx.hash, 0);
+	InitUTXOPool.addUTXO (coinbase_UTXO, (coinbase_tx.outputs).get(0));
+
+	// Now, we will add the other non coinbase transactions to the pool
+
+	for (init_tx:initBlock.txs) {
+	    int index = 0;
+	    for (initOp:init_tx.outputs) {
+		UTXO test_UTXO = UTXO (init_tx.hash, index);
+		InitUTXOPool.addUTXO (test_UTXO, initOp);
+		index++;
+	    }
+	}
+
+	// Finally, this will check if any inputs among the block's transactions
+	// were also earlier outputs. If this is the case, the UTXO will be
+	// deleted from the pool, as it has already been spent
+
+	for (init_tx:initBlock.txs) {
+	    int index = 0;
+	    for (initInp:init_tx.inputs) {
+		UTXO test_UTXO = UTXO (initInp.prevTxHash, initInp.outputIndex);
+		index++;
+		if (InitUTXOPool.contains(test_UTXO)) {
+		    InitUTXOPool.removeUTXO (test_UTXO);
+		}
+	    }
+	}
+
+	return InitUTXOPool;
+    }
+	
+
+	
+}

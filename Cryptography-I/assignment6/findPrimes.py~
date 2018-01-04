@@ -1,0 +1,10 @@
+# findPrimes.py
+import sys
+sys.path.append ("../")
+
+from numbthy import power_mod, inverse_mod
+
+# Gets the modulus associated with the four problems in the assigment
+# Moduli are large integers located on a separate line of the input file
+def getModulus (filename):
+    

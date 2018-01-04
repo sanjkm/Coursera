@@ -1,0 +1,108 @@
+# AES_CBC.py
+# Program will take an encrypted string and its key as inputs
+# Output is the decrypted string
+# There will also be an encryption function that does the reverse
+# It uses Cyber Block Chaining (CBC) for the block ciphers
+
+from CBC import CBCDecrypt, cutPadding
+from CTR import CTRDecrypt, incrementIVByOne
+
+blockLen = 16 # bytes
+hexVal = 16
+
+# Gets the cipher and associated data from input file
+def getCipherData (filename, delim):
+    CipherList = []
+    CipherDict = {}
+    i = 0
+    with open(filename, 'r') as f:
+        for line in f:
+            if i == 0:
+                i = 1
+                continue
+            x1 = line.rstrip('\n')
+            x_line = x1.split(delim)
+            mode, key, cipher = x_line[0], x_line[1], x_line[2]
+            CipherList.append(cipher)
+            CipherDict[cipher, 'mode'] = mode
+            CipherDict[cipher, 'key'] = key
+    f.close()
+    return CipherList, CipherDict
+
+# Takes cipher text in hex mode and returns same cipher text corresponding
+# to bytes
+def transformCipherText (cipherText):
+    
+    transCipherText = [];
+    for i in range (len(cipherText)/2):
+        TestHex = cipherText[2*i:2*i+2]
+        transCipherText.append(chr(int (TestHex, hexVal)))
+    return transCipherText
+
+def transAESKey (AESHexKey):
+    AESKey = ''
+    for i in range(len(AESHexKey)/2):
+        TestHex = AESHexKey[2*i:2*i+2]
+        AESKey += chr(int(TestHex, hexVal))
+    return AESKey
+
+# Takes list containing transformed cipher text (into bytes) as input
+# Returns IV value (prepended to CT) and a list
+# containing each cipher text block, based on block size (in bytes)
+# IV length is assumed to be equal to blockLen
+def createCipherBlocks (cipherList):
+    IV = cipherList[:blockLen]
+    cipherBlockList = []
+    for i in range(1, len(cipherList)/blockLen):
+        cipherBlockList.append (cipherList[blockLen*i:blockLen*(i+1)])
+        
+    if len(cipherList) % blockLen != 0:
+        cipherBlockList.append(cipherList[(len(cipherList)/blockLen)*blockLen:])
+    return IV, cipherBlockList
+
+def transformMessageText (msgText):
+    
+    transMessageText = '';
+    for i in range (len(msgText)):
+        TestHex = hex(ord(msgText[i]))[2:]
+        transMessageText += TestHex
+    return transMessageText
+
+
+
+def main():
+
+    InputFile = 'ciphers.txt'
+    delim = ','
+    CipherList, CipherDict = getCipherData (InputFile, delim)
+
+    OutputFile = 'messages.txt'
+    f_out = open(OutputFile, 'w')
+    
+    for cipherT in CipherList:
+        AESMode = CipherDict[cipherT, 'mode']
+        AESHexKey = CipherDict[cipherT, 'key']
+        IVHex = cipherT[:2*blockLen]
+        cipherList = transformCipherText (cipherT)
+        IV, cipherBlockList = createCipherBlocks (cipherList)
+        
+        AESKey = transAESKey (AESHexKey)
+
+        if AESMode == 'CBC':
+            msgBlockList = CBCDecrypt (AESKey, IV, cipherBlockList)
+            msgBlockList = cutPadding (msgBlockList)
+            msg = ''.join(msgBlockList)
+            print ''.join(msgBlockList)
+            out_str = AESMode + delim + AESHexKey + delim + msg + delim + IVHex
+            f_out.write(out_str + '\n')
+
+        elif AESMode == 'CTR':
+            msgBlockList = CTRDecrypt (AESKey, IV, cipherBlockList)
+            msg = ''.join(msgBlockList)
+
+            print ''.join(msgBlockList)
+            out_str = AESMode + delim + AESHexKey + delim + msg + delim + IVHex
+            f_out.write(out_str + '\n')
+            
+    f_out.close()
+main()

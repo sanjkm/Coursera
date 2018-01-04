@@ -1,0 +1,12 @@
+public class PairClass {
+
+    public class testPair {
+	int p1;
+	int p2;
+
+	void testPair (int _p1, int_p2) {
+	    this.p1 = _p1;
+	    this.p2 = _p2;
+	}
+
+	

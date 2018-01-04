@@ -1,0 +1,14 @@
+# CTR.py
+# Functions for AES encryption using randomized counter mode
+
+from Crypto.Cipher import AES
+
+def xor_strings (str1, str2):
+    return "".join(chr(ord(a)^ord(b)) for a,b in zip(str1, str2))
+
+def CTRDecrypt (AESKey, IV, cipherBlockList):
+    pass
+
+# Add integer n to IV and return in byte mode
+def incrementIV (IV, n):
+    pass
