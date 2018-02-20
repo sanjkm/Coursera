@@ -1,0 +1,11 @@
+def main():
+    # get the stop words
+    stopfile = 'stop_words_en.txt'
+    StopWordSet = set()
+    with open(stopfile, 'r') as f_stop:
+        for line in f_stop:
+           StopWordSet.add(line.strip())
+           print line.strip()
+    f_stop.close()
+
+main()

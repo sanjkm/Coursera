@@ -1,0 +1,1 @@
+WjobId=job_1517594425986_0003,submitTime=1517625414583,launchTime=1517625418769,firstMapTaskLaunchTime=1517625420975,firstReduceTaskLaunchTime=0,finishTime=1517625611301,resourcesPerMap=1024,resourcesPerReduce=0,numMaps=2,numReduces=0,user=jovyan,queue=default,status=SUCCEEDED,mapSlotSeconds=373,reduceSlotSeconds=0,jobName=Streaming Stopwords

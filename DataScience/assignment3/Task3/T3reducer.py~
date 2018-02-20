@@ -1,0 +1,6 @@
+# T3reducer.py
+# Takes the sorted output from the combiner program,
+# combines all like entries and sums their count,
+# determines whether names satisfy criteria,
+# and then prints out valid names
+

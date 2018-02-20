@@ -1,0 +1,52 @@
+# T3reducer.py
+# Takes the sorted output from the combiner program,
+# combines all like entries and sums their count,
+# determines whether names satisfy criteria,
+# and then prints out valid names and their count
+
+
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8') # required to convert to unicode
+
+
+# If more than 5% of name's appearances are in non-valid case, then
+# it is invalid
+def validNameCriteria (ValidCaseTotal, NonValidCaseTotal):
+    thresh = 0.05
+    if ((1.0 * NonValidCaseTotal) / (ValidCaseTotal + NonValidCaseTotal)) > thresh:
+        return False
+    return True
+
+def main():
+    CurrName, prevValid, ValidCount, NonValidCount = None, 0, 0, 0
+    generalCount = 0
+    sep = '\t'
+    
+    for line in sys.stdin:
+        Name, valid, NameCount = (line.strip()).split(sep,2)
+        valid, NameCount = int(valid), int(NameCount)
+
+        if (Name == CurrName) and (valid == prevValid):  # same as last row
+            generalCount += NameCount
+        elif (Name == CurrName) and (valid != prevValid): # valid switched from 0 to 1, same name
+            NonValidCount = generalCount
+            generalCount = NameCount
+            prevValid = valid
+        elif (Name != CurrName): # new name, count up the valid and nonvalid from previous name
+            if CurrName != None:
+                if prevValid == 1:
+                    ValidCount = generalCount
+                else:
+                    NonValidCount = generalCount
+                if validNameCriteria (ValidCount, NonValidCount) == True:
+                    print "%s\t%d" % (CurrName, ValidCount)
+
+            CurrName, prevValid = Name, valid
+            generalCount = NameCount
+            ValidCount, NonValidCount = 0,0
+
+main()
+    
+

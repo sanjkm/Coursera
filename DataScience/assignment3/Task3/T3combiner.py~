@@ -1,0 +1,4 @@
+# T3combiner.py
+# Takes mapper output as input, counts number of occurrences of
+# word and valid_flag, and outputs the results
+

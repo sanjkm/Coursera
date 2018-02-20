@@ -1,0 +1,37 @@
+# count_pairs.py
+# Process wikipedia articles in pyspark,
+# count number of word pairs beginning with narodnaya
+
+from pyspark import SparkConf, SparkContext
+from collections import Counter
+
+import re
+
+def parse_article(line):
+    try:
+        article_id, text = unicode(line.rstrip()).split('\t', 1)
+        text = re.sub("^\W+|\W+$", "", text, flags=re.UNICODE)
+        words = re.split("\W*\s+\W*", text, flags=re.UNICODE)
+        return words
+    except ValueError as e:
+        return []
+
+def processRecord (record):
+    key_word = "is"
+    couple_list = []
+    flag = 0
+    cnt = Counter()
+    for word in record:
+        if flag == 1:
+            couple_list.append(word.lower())
+            cnt[word.lower()] += 1
+        flag = 0
+        if word.lower() == key_word:
+            flag = 1
+    return cnt
+    
+sc = SparkContext(conf=SparkConf().setAppName("MyApp").setMaster("local"))
+
+wiki = sc.textFile("/data/wiki/en_articles_part/articles-part", 16).map(parse_article)
+result = wiki.take(1)[0]
+key_word_pair = wiki.map(processRecord)

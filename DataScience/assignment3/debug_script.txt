@@ -1,0 +1,1 @@
+cat mydata | python ./mapper.py | sort | python ./reducer.py

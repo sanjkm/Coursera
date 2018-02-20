@@ -1,0 +1,12 @@
+# GetStopCount.py
+# Get the total words and the total stop words from the Hadoop counters
+# within the log files
+# Majority of this program derives the name of the appropriate file
+# from which to get the data
+
+# Application job ID string is fed into program as an argument from stdin
+
+LogDir = "/tmp/hadoop-yarn/staging/history/done_intermediate/jovyan/"
+
+def main():
+    pass
