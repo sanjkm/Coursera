@@ -1,0 +1,51 @@
+# path_code.py
+
+from pyspark import SparkConf, SparkContext
+
+def parse_edge(s):    
+    user, follower = s.split("\t")
+    return (int(user), int(follower))
+
+def step(item):
+    prev_v, prev_d, next_v = item[0], item[1][0], item[1][1]
+    return (next_v, prev_d + 1)
+
+def complete(item):
+    v, old_d, new_d = item[0], item[1][0], item[1][1]
+    return (v, old_d if old_d is not None else new_d)
+
+sc = SparkContext(conf=SparkConf().setAppName("MyApp").setMaster("local"))
+
+n = 400  # number of partitions
+edges = sc.textFile("/data/twitter/twitter_sample.txt").map(parse_edge).cache()
+forward_edges = edges.map(lambda e: (e[1], e[0])).partitionBy(n).persist()
+
+x = 12 # initial user
+y = 34 # end user
+d = 0
+distances = sc.parallelize([(x, d)]).partitionBy(n)
+while True:
+    outer =  distances.filter(lambda i:i[1]==d)
+    candidates = outer.join(forward_edges, n).map(step)
+    new_distances = distances.fullOuterJoin(candidates, n).map(complete, True).persist()
+    count = new_distances.filter(lambda i:i[1]==d+1).count()
+    count_y = new_distances.filter(lambda i:i[0] == y).count()
+    print ("%d\t%d" % (d, count))
+    d += 1
+    distances = new_distances
+    
+    if count_y > 0:
+        print d
+        break
+
+path = [y]
+while d > 1:
+    distances_y = sc.parallelize([(y,0)]).partitionBy(n)
+    candidates_y = distances_y.join(edges, n).map(step)
+    path_link = distances.filter(lambda i:i[1] == d - 1).join(candidates_y)
+    prev_path_member = path_link.take(1)[0][0]
+    path = [prev_path_member] + path
+    y = prev_path_member
+    d = d - 1
+path = [x] + path
+print ','.join(map(str,path))

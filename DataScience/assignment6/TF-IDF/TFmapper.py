@@ -1,0 +1,45 @@
+# TFmapper.py
+# TF-IDF mapper routine
+# Outputs Word, Article ID, word frequency,total number of words in article ex
+# stop words
+
+import sys
+import re
+from collections import Counter
+
+reload(sys)
+sys.setdefaultencoding('utf-8') # required to convert to unicode
+
+StopWordsFile = 'stop_words_en.txt'
+StopWordsList = []
+
+# Makes a list containing the stop words
+with open(StopWordsFile, 'r') as f_stop:
+    for line in f_stop:
+        StopWordsList.append(line.strip())
+f_stop.close()
+
+
+for line in sys.stdin:
+    
+    total_words_ex_stop, word_list_ex_stop = 0, []
+    
+    try:
+        article_id, text = unicode(line.strip()).split('\t', 1)
+    except ValueError as e:
+        continue
+    text = re.sub("^\W+|\W+$", "", text, flags=re.UNICODE)
+    words = re.split("\W*\s+\W*", text, flags=re.UNICODE)
+
+    for word in words:
+        if word.lower() in StopWordsList:
+            continue
+        word_list_ex_stop.append(word.lower())
+
+    total_words_ex_stop = len(word_list_ex_stop)
+    cnt = Counter(word_list_ex_stop)
+    for word in cnt:
+        print "%s\t%s\t%d\t%d" % (word, article_id,
+                                  cnt[word],total_words_ex_stop)
+
+
